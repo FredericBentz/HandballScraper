@@ -6,6 +6,12 @@
 import scrapy
 
 
+class CompetitionItem(scrapy.Item):
+    competition_name = scrapy.Field()
+    competition_level = scrapy.Field()
+    competition_id_ffh = scrapy.Field()
+
+
 class HandballscraperItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
