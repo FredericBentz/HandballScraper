@@ -18,12 +18,12 @@ script = """
 
 def extract_last_from_url(url):
     url_split = url.split('/')
-    level_brut = url_split[-1]
-    level = level_brut.strip()\
+    category_brut = url_split[-1]
+    category = category_brut.strip()\
         .replace('regions', 'régional')\
         .replace('departements', 'départemental')\
         .replace('coupe-de-france', 'national').strip()
-    return level
+    return category
 
 
 class CompetitionSpider(scrapy.Spider):
@@ -53,7 +53,7 @@ class CompetitionSpider(scrapy.Spider):
 
 
     def parse(self, response):
-        level = extract_last_from_url(response.url)
+        category = extract_last_from_url(response.url)
         rows = response.css('.s-tournaments-row')
 
         # games = response.css('.s-fixtures-table-row__wrapper').extract()
@@ -68,7 +68,7 @@ class CompetitionSpider(scrapy.Spider):
             competition_id_ffh = extract_last_from_url(competition_link_list[0])
             # Competition ================================
             items['competition_name'] = competition_name
-            items['competition_level'] = level
+            items['competition_category'] = category
             items['competition_id_ffh'] = competition_id_ffh
 
             yield items
