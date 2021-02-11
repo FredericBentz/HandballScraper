@@ -19,7 +19,7 @@ script = """
 class HandballSpider(scrapy.Spider):
     name = "handball"
     allowed_domains = ['ffhandball.fr']
-    start_urls = ['https://www.ffhandball.fr/fr/competition/15603#poule-78325']
+    start_urls = ['https://www.ffhandball.fr/fr/competition/15604#poule-78106']
 
     child_num = 1
     script = """
