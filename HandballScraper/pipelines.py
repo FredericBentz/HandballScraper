@@ -21,10 +21,18 @@ class CompetitionPipeline(object):
     def __init__(self):
         self.create_connection()
         self.ids_seen = set()
-        # self.create_table()
+
+    # def create_connection(self):
+    #     self.connexion = mysql.connector.connect(connect_info())
+    #     self.cursor = self.connexion.cursor()
 
     def create_connection(self):
-        self.connexion = mysql.connector.connect(connect_info)
+        self.connexion = mysql.connector.connect(
+            host='localhost',
+            user='root',
+            passwd='',
+            database='handball'
+        )
         self.cursor = self.connexion.cursor()
 
     def process_item(self, item, spider):
@@ -33,16 +41,41 @@ class CompetitionPipeline(object):
 
     def store_db(self, item):
         self.cursor.execute('''
-        SET @cName = %s, @cCategory = %s, @cIdFfd = $s;''', (
+        SET @cName = %s, @cCategory = %s, @cIdFfd = %s;''', (
             item['competition_name'],
             item['competition_category'],
             item['competition_id_ffh']
         ))
-        # Insert competition_level
+        # Insert competition_category
         self.cursor.execute('''
-        INSERT INTO  category (label)
-        SELECT * FROM (SELECT @cCategory) AS cTmp
+            INSERT INTO  category (label)
+            SELECT * FROM (SELECT @cCategory) AS cTmp
+            WHERE NOT EXISTS (
+                SELECT label 
+                FROM category 
+                WHERE label = @cCategory) 
+            LIMIT 1;
+        ''')
+
+        self.cursor.execute('''
+            SET @catId = (
+                SELECT id 
+                FROM category 
+                WHERE label = @cCategory
+            );
+        ''')
+
+        self.cursor.execute('''
+        INSERT INTO  league (label,category_id, id_ffh)
+        SELECT * 
+        FROM (
+            SELECT @cName, @catId, @cIdFfd
+        ) AS lTmp
         WHERE NOT EXISTS (
-        SELECT label FROM category WHERE label = @hNom) LIMIT 1;''')
+            SELECT label 
+            FROM league 
+            WHERE label = @cName and id_ffh = @cIdFfd) 
+            LIMIT 1;
+        ''')
 
         self.connexion.commit()

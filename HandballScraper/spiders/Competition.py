@@ -28,6 +28,11 @@ def extract_last_from_url(url):
 
 class CompetitionSpider(scrapy.Spider):
     name = "competition"
+    custom_settings = {
+        'ITEM_PIPELINES': {
+            'HandballScraper.pipelines.CompetitionPipeline': 400
+        }
+    }
     allowed_domains = ['ffhandball.fr']
     start_urls = [
         'https://www.ffhandball.fr/fr/competitions/national',
